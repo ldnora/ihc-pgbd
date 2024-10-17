@@ -1,0 +1,70 @@
+Qual é a frequência de uso de agendas? unica escolha
+        - frequentemente
+        - nunca
+
+Qual é a sua ocupação principal? unica escolha
+        - aluno
+        - professor
+        - servidor
+        - outro, digite
+
+Qual é a sua familiaridade com o uso de tecnologias? unica escolha
+        - muito
+        - pouco
+        - nada
+
+Qual agenda você usa? multipla escolha
+        - google agenda
+        - papel
+        - outra, digite
+
+Essa agenda é acessível?
+        - concordo totalmente
+        - concordo parcialmente
+        - não concordo nem discordo
+        - discordo parcialmente
+        - discordo totalmente
+
+        caso o usuário responda que discorda, tem essa pergunta:
+        Descreva o que pode ser melhorado na agenda em termos de acessibilidade:
+
+Essa agenda é de fácil uso?
+        - concordo totalmente
+        - concordo parcialmente
+        - não concordo nem discordo
+        - discordo parcialmente
+        - discordo totalmente
+
+        caso o usuário responda que discorda, tem essa pergunta:
+	Descreva o que pode ser melhorado em termos de usabilidade na agenda: 
+
+Qual é o seu objetivo a uma agenda? multipla resposta
+        - organização
+        - gestão de tempo
+        - produtividade
+        - outra, digite
+
+Qual ou quais funcionalidades você usaria frequentemente se existisse em sua agenda: multipla resposta
+        - sumário de eventos dado um determinado período de tempo
+        - priorização de tarefas
+        - agrupar pessoas em uma tarefa
+        - agrupar tarefas de acordo com um rótulo
+        - lembretes customizados
+        - outra, digite
+
+Como você gostaria de ser notificado sobre um evento?
+        - notificação
+        - ligação
+        - email
+        - alarme
+        - outro, digite
+
+Você usa a agenda principalmente em qual dispositivo? unica opção
+        - smartphone
+        - computador/notebook
+        - smartwatch
+        - outro, digite
+
+Qual ou quais funcionalidades ou sugestões você teria para uma agenda? digite sua resposta (opcional)
+
+
