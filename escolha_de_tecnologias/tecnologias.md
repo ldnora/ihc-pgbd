@@ -9,12 +9,17 @@ Aqui estão algumas tecnologias que podemos utilizar para o desenvolvimento do b
 
 ## Backend e banco de dados: 
 - [x]  Node.js + express.js + MongoDB (noSQL) ou PostgreSQL ou sqlite (SQL)
-  - Vamos usar essa tecnologia pois representa que é bom e possui bastante conteúdo na internet
+  - Vamos usar essa tecnologia pois representa que é bom e possui bastante conteúdo na internet.
+    Obs.: nunca usamos 
 - [ ]  Django (python) + PostgreSQL
 - [ ]  Ruby on Rails + PostgreSQL ou MySQL
 
 ## Frontend: 
-- [ ] Chadcn não é low-code, envolve a programação, mas a estilização não precisa ser feita, apenas usar o html
+- [ ] Chadcn não é low-code, envolve html e a estilização não precisa ser feita
 - [ ] Retol
 - [ ] Mendix
-- [ ] 
+- [ ] ToolJet
+- [ ] Apex Designer
+- [ ] Convertigo
+
+- Obs.: as ferramentas para o front foram escolhidas para que possam rodar em um container docker
