@@ -21,5 +21,6 @@ Aqui estão algumas tecnologias que podemos utilizar para o desenvolvimento do b
 - [ ] ToolJet
 - [ ] Apex Designer
 - [ ] Convertigo
+- [ ] Figma to flutter
 
 - Obs.: as ferramentas para o front foram escolhidas para que possam rodar em um container docker
