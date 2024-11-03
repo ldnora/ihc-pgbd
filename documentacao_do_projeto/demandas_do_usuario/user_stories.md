@@ -8,11 +8,6 @@
 - Como usuário da agenda, desejo consultar os horários de minha semana 
 - Como usuário da agenda, desejo excluir eventos
 - Como usuário da agenda, desejo 
-- Como usuário da agenda, desejo 
-- Como usuário da agenda, desejo 
-- Como usuário da agenda, desejo 
-- Como usuário da agenda, desejo 
-
 
 
 ## Avançados 
