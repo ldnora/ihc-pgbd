@@ -1,64 +1,27 @@
-const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const { createTables } = require('./tables');
+const { createTriggers } = require('./triggers');
+const { createViews } = require('./views');
+const functions = require('./functions');
+const queries = require('./queries');
 
-const app = express();
-app.use(express.json());
-
-const db = new sqlite3.Database(path.join(__dirname, 'database.sqlite'), (err) => {
-  if (err) {
-    console.error('Erro ao conectar ao banco de dados:', err);
-  } else {
-    console.log('Conectado ao banco SQLite');
-    
-    db.run(`
-      CREATE TABLE IF NOT EXISTS contatos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        telefone TEXT,
-        email TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-  }
-});
-
-app.get('/', (req, res) => {
-  res.json({ message: 'API funcionando!' });
-});
-
-app.get('/contatos', (req, res) => {
-  db.all('SELECT * FROM contatos', [], (err, rows) => {
+// Criando conexão com o banco
+const banco_de_dados_path = path.join(__dirname, 'database.sqlite');
+const banco_de_dados = new sqlite3.Database(banco_de_dados_path, (err) => {
     if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+        console.error('Erro ao conectar ao banco de dados:', err);
+    } else {
+        console.log('Conectado ao banco SQLite');
+        
+        // Inicializando estruturas do banco
+        createTables(banco_de_dados);
+        createTriggers(banco_de_dados);
+        createViews(banco_de_dados);
     }
-    res.json(rows);
-  });
 });
 
-app.post('/contatos', (req, res) => {
-  const { nome, telefone, email } = req.body;
-  
-  db.run(
-    'INSERT INTO contatos (nome, telefone, email) VALUES (?, ?, ?)',
-    [nome, telefone, email],
-    function(err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({
-        id: this.lastID,
-        nome,
-        telefone,
-        email
-      });
-    }
-  );
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+// Exportando banco configurado com todas as funcionalidades
+module.exports = {
+    banco_de_dados
+};
