@@ -6,7 +6,6 @@ const { createViews } = require('./views');
 const functions = require('./functions');
 const queries = require('./queries');
 
-// Criando conexão com o banco
 const banco_de_dados_path = path.join(__dirname, 'database.sqlite');
 const banco_de_dados = new sqlite3.Database(banco_de_dados_path, (err) => {
     if (err) {
@@ -21,7 +20,6 @@ const banco_de_dados = new sqlite3.Database(banco_de_dados_path, (err) => {
     }
 });
 
-// Exportando banco configurado com todas as funcionalidades
 module.exports = {
     banco_de_dados
 };
