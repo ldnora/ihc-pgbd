@@ -13,7 +13,8 @@ const queries  = {
     `,
     update_usuario: `
         update usuario 
-        set usuario_id = ?, nome = ?, email = ?, senha = ? 
+        set nome = ?, email = ?, senha = ? 
+        where usuario_id = ?
     `,
     delete_usuario: `
         delete from usuario 
@@ -35,14 +36,15 @@ const queries  = {
     `,
     update_categoria: `
         update categoria
-        set categoria_id = ?, nome = ?, descricao = ?
+        set nome = ?, descricao = ?
+        where categoria_id = ?
     `,
     delete_categoria: `
         delete from categoria
         where categoria_id = ?
     `,
 
-    
+
     get_all_evento: `
         select *
         from evento
@@ -62,7 +64,8 @@ const queries  = {
     `,
     update_evento: `
         update evento
-        set evento_id = ?, usuario_id = ?, categoria_id = ?, nome = ?, descricao = ?, data_inicio = ?, data_fim
+        set usuario_id = ?, categoria_id = ?, nome = ?, descricao = ?, data_inicio = ?, data_fim = ?
+        where evento_id = ?
     `,
     delete_evento: `
         delete from evento
