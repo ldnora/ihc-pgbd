@@ -1,33 +1,35 @@
-### Usuário
+# Tabelas
 
-| Campo     | Tipo     |
-|-----------|----------|
-| idUsuario | int pk   |
-| nome      | string   |
-| email     | string   |
-| senha     | string   |
+## Usuário
 
-### Categoria
+| Campo         | Tipo     |
+|-              |-         |
+| usuario_id    | int pk   |
+| nome          | string   |
+| email         | string   |
+| senha         | string   |
 
-| Campo      | Tipo    |
-|------------|---------|
-| idCategoria| int pk  |
-| nome       | string  |
-| descricao  | string  |
+## Categoria
 
-### Evento
+| Campo         | Tipo    |
+|-              |-        |
+| categoria_id  | int pk  |
+| nome          | string  |
+| descricao     | string  |
 
-| Campo       | Tipo        |
-|-------------|---------    |
-| idEvento    | int pk      |
-| idUsuario   | int fk      |
-| idCategoria | int         |
-| titulo      | string      |
-| descricao   | string      |
-| data_inicio | datetime    |
-| data_fim    | datetime    |
+## Evento
+
+| Campo         | Tipo        |
+|-              |-            |
+| evento_id     | int pk      |
+| usuario_id    | int fk      |
+| categoria_id  | int fk      |
+| nome          | string      |
+| descricao     | string      |
+| data_inicio   | datetime    |
+| data_fim      | datetime    |
 
 **Referências:**
 
-- `idUsuario` refere-se ao ID do usuário da tabela **Usuário**
-- `idCategoria` refere-se ao ID da categoria da tabela **Categoria**
+- `usuario_id` refere-se ao ID do usuário da tabela **Usuário**
+- `categoria_id` refere-se ao ID da categoria da tabela **Categoria**
