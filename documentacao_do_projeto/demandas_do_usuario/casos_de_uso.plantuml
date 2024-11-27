@@ -1,23 +1,17 @@
 @startuml agenda
-
 left to right direction
 
 actor "Usuário" as user 
 
 rectangle Agenda {
-  usecase "Adicionar notas" as nota
-
   usecase "Criar eventos" as criar
   usecase "Editar eventos" as editar
   usecase "Excluir eventos" as excluir 
   usecase "Consultar agenda" as ca
 }
 
-nota <-.- criar : <<extends>> 
-
 user --> criar
 user --> editar
 user --> excluir
 user --> ca
-
 @enduml
