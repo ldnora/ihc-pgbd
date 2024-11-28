@@ -1,29 +1,14 @@
 const express = require('express');
-const port = 3000;
-
-const { initializeDatabase } = require('./data/banco_de_dados');
+const { init_banco_de_dados } = require('./data/banco_de_dados');
+const routes = require('./routes');
 
 const app = express();
-app.use(express.json()); // Middleware para parse JSON
+app.use(express.json());
 
-// Função para inicializar o banco e criar as tabelas
-async function initializeDatabase() {
-    try {
-        await criar_tabelas(banco_de_dados);
-        console.log('Tabelas criadas com sucesso!');
-    } catch (err) {
-        console.error('Erro ao criar tabelas:', err);
-    }
-}
+app.use('/api', routes);
 
-initializeDatabase();
+init_banco_de_dados();
 
-// Rota de teste
-app.get('/', (req, res) => {
-    res.send('API Agenda Digital funcionando!');
-});
-
-// Inicia o servidor
-app.listen(port, () => {
-    console.log(`Servidor rodando na porta ${port}`);
+app.listen(3000, () => {
+    console.log(`Servidor rodando na porta 3000`);
 });

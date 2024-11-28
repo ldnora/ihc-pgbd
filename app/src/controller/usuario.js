@@ -1,4 +1,4 @@
-import { open_banco_de_dados } from '../data/banco_de_dados';
+const open_banco_de_dados = require('../data/banco_de_dados');
 
 const usuarioController = {
     async criar_usuario(req, res) {
@@ -40,4 +40,4 @@ const usuarioController = {
     }
 };
 
-module.exports = { usuarioController };
+module.exports = usuarioController;

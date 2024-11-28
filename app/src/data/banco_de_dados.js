@@ -8,42 +8,42 @@ async function open_banco_de_dados() {
         filename: dbPath,
         driver: sqlite3.Database
     });
-}
+};
 
 async function init_banco_de_dados() {
     const banco_de_dados = await open_banco_de_dados();
 
     // tabela de usuários 
     await banco_de_dados.run(`
-        CREATE TABLE IF NOT EXISTS Usuario (
-            usuario_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome VARCHAR(30),
-            email VARCHAR(30),
-            senha VARCHAR(255)
+        create table if not exists usuario (
+            usuario_id integer primary key autoincrement,
+            nome varchar(30),
+            email varchar(30),
+            senha varchar(255)
         )
     `);
 
     // tabela de categorias
     await banco_de_dados.run(`
-        CREATE TABLE IF NOT EXISTS Categoria (
-            categoria_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome VARCHAR(30),
-            descricao VARCHAR(255)
+        create table if not exists categoria (
+            categoria_id integer primary key autoincrement,
+            nome varchar(30),
+            descricao varchar(255)
         )
     `);
 
     // tabela de evento
     await banco_de_dados.run(`
-        CREATE TABLE IF NOT EXISTS Evento (
-            evento_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            usuario_id INTEGER,
-            categoria_id INTEGER,
-            nome VARCHAR(30) NOT NULL,
-            descricao VARCHAR(255),
-            data_inicio DATETIME NOT NULL,
-            data_fim DATETIME NOT NULL,
-            FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id),
-            FOREIGN KEY (categoria_id) REFERENCES categoria(categoria_id)
+        create table if not exists evento (
+            evento_id integer primary key autoincrement,
+            usuario_id integer,
+            categoria_id integer,
+            nome varchar(30) not null,
+            descricao varchar(255),
+            data_inicio datetime not null,
+            data_fim datetime not null,
+            foreign key (usuario_id) references usuario(usuario_id),
+            foreign key (categoria_id) references categoria(categoria_id)
         )
     `);
 
@@ -53,26 +53,19 @@ async function init_banco_de_dados() {
         before insert on Evento
         for each row
         begin
-            if exists (
+            select raise(abort, 'conflito de horários detectado. você não pode criar dois ou mais eventos no mesmo horário existente.')
+            where exists (
                 select 1
-                from Evento
-                where (new.data_inicio between data_inicio and data_fim or
-                       new.data_fim between data_inicio and data_fim or
-                       (new.data_inicio <= data_inicio and new.data_fim >= data_fim))
-            ) then 
-                signal sqlstate '45000'
-                set message_text = 'Conflito de horários detectado. Você não pode criar dois ou mais eventos no mesmo horário existente.'
-            end if;
+                from evento
+                where (new.data_inicio between data_inicio and data_fim
+                    or new.data_fim between data_inicio and data_fim
+                    or (new.data_inicio <= data_inicio and new.data_fim >= data_fim))
+            );
         end;
-    `),
-
-    await banco_de_dados.run(`
-        create function consultar_eventos_por_semana(offset int)
-        
     `)
-}
+};
 
 module.exports = {
     open_banco_de_dados,
     init_banco_de_dados
-}
+};
