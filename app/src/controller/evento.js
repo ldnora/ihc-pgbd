@@ -1,4 +1,4 @@
-const open_banco_de_dados = require("../data/banco_de_dados");
+const { open_banco_de_dados } = require("../data/banco_de_dados");
 const dayjs = require('dayjs');
 const iso_week = require('dayjs/plugin/isoWeek');
 dayjs.extend(iso_week);
@@ -6,14 +6,15 @@ dayjs.extend(iso_week);
 
 const eventoController = {
     async criar_evento(req, res) {
-        const db = open_banco_de_dados();
-        const { evento_id, usuario_id, categoria_id, nome, descricao, data_inicio, data_fim } = req.body;
+        const db = await open_banco_de_dados();
+        const { usuario_id, categoria_id, nome, descricao, data_inicio, data_fim } = req.body;
 
         try {
-            await db.run('insert into Evento (evento_id, usuario_id, categoria_id, nome, descricao, data_inicio, data_fim) values (?, ?, ?, ?, ?, ?, ?)', [evento_id, usuario_id, categoria_id, nome, descricao, data_inicio, data_fim]);
+            await db.run('insert into Evento ( usuario_id, categoria_id, nome, descricao, data_inicio, data_fim) values (?, ?, ?, ?, ?, ?)', [ usuario_id, categoria_id, nome, descricao, data_inicio, data_fim]);
 
             res.status(201).send({ success: true, message: 'Evento criado com sucesso' });
         } catch (error) {
+            console.error('Erro ao criar um evento:', error.message);
             res.status(500).send({ error: 'Erro interno do servidor' });
         }
     },
@@ -35,7 +36,7 @@ const eventoController = {
                 (data_fim between ? and ?))
             `;
     
-            let eventos_semanais = (await db).all(select_eventos_da_semana, [usuario_id, inicio_da_semana, fim_de_semana, inicio_da_semana, fim_de_semana]);
+            let eventos_semanais = (await db).get(select_eventos_da_semana, [usuario_id, inicio_da_semana, fim_de_semana, inicio_da_semana, fim_de_semana]);
             
             res.status(200).json({
                 success: true,
@@ -46,6 +47,20 @@ const eventoController = {
         catch (error) {
             res.status(500).send({ error: 'Erro interno do servidor' });
         }
+    },
+
+    async get_all_eventos(req, res) {
+        try {
+            const db = await open_banco_de_dados();
+            
+            const eventos = await db.all('select * from Evento');
+
+            res.status(200).json(eventos);
+        } catch (error) {
+            console.error('Erro ao consultar os eventos:', error.message);
+            res.status(500).send({error: 'Erro interno do sertior'});
+        }
+
     }
 };
 

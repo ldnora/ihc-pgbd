@@ -15,7 +15,7 @@ async function init_banco_de_dados() {
 
     // tabela de usuários 
     await banco_de_dados.run(`
-        create table if not exists usuario (
+        create table if not exists Usuario (
             usuario_id integer primary key autoincrement,
             nome varchar(30),
             email varchar(30),
@@ -25,7 +25,7 @@ async function init_banco_de_dados() {
 
     // tabela de categorias
     await banco_de_dados.run(`
-        create table if not exists categoria (
+        create table if not exists Categoria (
             categoria_id integer primary key autoincrement,
             nome varchar(30),
             descricao varchar(255)
@@ -34,9 +34,9 @@ async function init_banco_de_dados() {
 
     // tabela de evento
     await banco_de_dados.run(`
-        create table if not exists evento (
+        create table if not exists Evento (
             evento_id integer primary key autoincrement,
-            usuario_id integer,
+            usuario_id integer not null,
             categoria_id integer,
             nome varchar(30) not null,
             descricao varchar(255),
