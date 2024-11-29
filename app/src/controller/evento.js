@@ -49,7 +49,7 @@ const eventoController = {
         }
     },
 
-    async get_all_eventos(req, res) {
+    async get_all(req, res) {
         try {
             const db = await open_banco_de_dados();
             
@@ -60,7 +60,19 @@ const eventoController = {
             console.error('Erro ao consultar os eventos:', error.message);
             res.status(500).send({error: 'Erro interno do sertior'});
         }
+    },
 
+    async deletar_evento(req, res){
+        const db = await open_banco_de_dados();
+        const { evento_id } = req.body;
+
+        try {
+            db.run('delete from Evento where evento_id = ?', [evento_id]);
+            res.status(200).send({ success: true, message: 'Evento exluído com sucesso '});
+        } catch (error) {
+            console.error('Erro ao tentar deletar usuário:', error.message);
+            res.status(500).send({ error: 'Erro interno do servidor'});
+        }
     }
 };
 

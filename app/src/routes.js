@@ -4,7 +4,7 @@ const router = express.Router();
 // controllers 
 const eventoController = require('./controller/evento.js');
 const usuarioController = require('./controller/usuario');
-const path = require('path');
+const categoriaController = require('./controller/categoria');
 
 router.get('/', (req, res) => {
     res.send('API rodando');
@@ -13,14 +13,16 @@ router.get('/', (req, res) => {
 // rotas da API par ao usuário
 router.post('/usuario/criar', usuarioController.criar_usuario);
 router.delete('/usuario/deletar', usuarioController.deletar_usuario);
-router.get('/usuario/get_all_usuarios', usuarioController.get_all_usuarios);
+router.get('/usuario/get_all', usuarioController.get_all);
 
 // rotas da API para os eventos
 router.post('/evento/criar', eventoController.criar_evento);
 router.get('/evento/get_eventos_semanais', eventoController.get_eventos_semanais);
-router.get('/evento/get_all_eventos', eventoController.get_all_eventos);
+router.get('/evento/get_all', eventoController.get_all);
 
 // rotas da API para as categorias
-// TODO
+router.post('/categoria/criar', categoriaController.criar);
+router.get('/categoria/get_all', categoriaController.get_all);
+router.get('/categoria/deletar', categoriaController.deletar);
 
 module.exports = router;

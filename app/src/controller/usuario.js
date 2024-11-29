@@ -41,7 +41,7 @@ const usuarioController = {
         }
     },
 
-    async get_all_usuarios(req, res) {
+    async get_all(req, res) {
         try {
             const db = await open_banco_de_dados();
 
