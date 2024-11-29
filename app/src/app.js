@@ -9,6 +9,10 @@ app.use('/api', routes);
 
 init_banco_de_dados();
 
-app.listen(3000, () => {
-    console.log(`Servidor rodando na porta 3000`);
-});
+if (require.main === module) {
+    app.listen(3000, () => {
+        console.log(`Servidor rodando na porta 3000`);
+    });
+}
+
+module.exports = app;
