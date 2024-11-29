@@ -58,7 +58,7 @@ const eventoController = {
             res.status(200).json(eventos);
         } catch (error) {
             console.error('Erro ao consultar os eventos:', error.message);
-            res.status(500).send({error: 'Erro interno do sertior'});
+            res.status(500).send({error: 'Erro interno do servidor'});
         }
     },
 

@@ -49,7 +49,7 @@ const usuarioController = {
 
             res.status(200).json(usuarios);
         } catch (error) {
-            res.status(500).send({error: 'Erro interno do sertior'});
+            res.status(500).send({error: 'Erro interno do servdior'});
         }
     }
 };
