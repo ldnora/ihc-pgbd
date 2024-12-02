@@ -11,11 +11,12 @@
 
 ## Categoria
 
-| Campo         | Tipo    |
-|-              |-        |
-| categoria_id  | int pk  |
-| nome          | string  |
-| descricao     | string  |
+| Campo         | Tipo      |
+|-              |-          |
+| categoria_id  | int pk    |
+| usuario_id    | int fk    |
+| nome          | string    |
+| descricao     | string    |
 
 ## Evento
 

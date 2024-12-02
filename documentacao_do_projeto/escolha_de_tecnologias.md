@@ -5,6 +5,7 @@ Aqui estão algumas tecnologias que podemos utilizar para o desenvolvimento do b
 ## Infraestrutura: 
 - [x]  docker para os containers e docker -> compose para a orquestração de containers. Pensei neles pois você consegue ter um ambiente de desenvolvimento padronizado em diferentes sistemas operacionais com suas particularidades, no caso Leandro com ubuntu e Lorenzo com windows. Pode-se fazer 3 containers, um para o banco de dados, outro para o backend e outro para o front, sendo que os 3 estão em uma rede docker com as portas liberadas para realizar a comunicação
   - Como o Leandro tem maior familiaridade com docker, iremos usá-lo
+  - Entretanto, o Leandro teve dificuldades ao usar o docker para criar o projeto, decidiu abandonar o docker
 - [ ]  Ferramentas BaaS (firebase, etc) (obs.: nesse caso, roda tudo nela, ao invés de rodar localmente)
 
 ## Backend e banco de dados: 
