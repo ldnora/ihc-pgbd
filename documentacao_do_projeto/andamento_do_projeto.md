@@ -29,4 +29,6 @@ Criação do modelo relacional, definição dos requisitos, inicio da criação 
 
 ### A fazer
 - [ ] Criar o frontend
+- [ ] Criar usuários para o sgbd de dar permissões a eles para realizar certas consultas, triggers, etc
+- [ ] 
 

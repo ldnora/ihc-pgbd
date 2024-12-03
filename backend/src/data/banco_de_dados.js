@@ -65,8 +65,19 @@ async function init_banco_de_dados() {
             );
         end;
     `);
+
+    await banco_de_dados.run(`
+        create trigger delete_categoria_evento
+        before delete Categoria
+        for each row
+        begin 
+            update Eventos
+            set categoria_id = null
+            where categoria_id = old.categoria_id;
+        end;
+    `);
     
-    // console.log('Banco de dados inicializado com sucesso!');
+    console.log('Banco de dados inicializado com sucesso!');
 };
 
 module.exports = {
