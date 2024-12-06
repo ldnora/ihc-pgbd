@@ -17,11 +17,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Description } from "@radix-ui/react-dialog";
 
 const Calendar: React.FC = () => {
   const [currentEvents, setCurrentEvents] = useState<EventApi[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [newEventTitle, setNewEventTitle] = useState<string>("");
+  const [newEventDescription, setNewDescription] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<DateSelectArg | null>(null);
 
   useEffect(() => {
@@ -60,6 +62,7 @@ const Calendar: React.FC = () => {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setNewEventTitle("");
+    setNewDescription("");
   };
 
   const handleAddEvent = (e: React.FormEvent) => {
@@ -71,6 +74,7 @@ const Calendar: React.FC = () => {
       const newEvent = {
         id: `${selectedDate.start.toISOString()}-${newEventTitle}`,
         title: newEventTitle,
+        description: newEventDescription,
         start: selectedDate.start,
         end: selectedDate.end,
         allDay: selectedDate.allDay,
@@ -149,21 +153,30 @@ const Calendar: React.FC = () => {
             <DialogTitle>Add New Event Details</DialogTitle>
           </DialogHeader>
           <form className="space-x-5 mb-4" onSubmit={handleAddEvent}>
-            <input
-              type="text"
-              placeholder="Event Title"
-              value={newEventTitle}
-              onChange={(e) => setNewEventTitle(e.target.value)} // Update new event title as the user types.
-              required
-              className="border border-gray-200 p-3 rounded-md text-lg"
-            />
-            <button
-              className="bg-green-500 text-white p-3 mt-5 rounded-md"
-              type="submit"
-            >
-              Add
-            </button>{" "}
-            {/* Button to submit new event */}
+            <div className="flex flex-col gap-3">
+              <input
+                type="text"
+                placeholder="Event Title"
+                value={newEventTitle}
+                onChange={(e) => setNewEventTitle(e.target.value)} // Update new event title as the user types.
+                required
+                className="border border-gray-200 p-3 rounded-md text-lg"
+              />
+              <input
+                type="text"
+                placeholder="Event Description"
+                value={newEventDescription}
+                onChange={(e) => setNewDescription(e.target.value)} 
+                className="border border-gray-200 p-3 rounded-md text-lg w-full"
+              />
+              <button
+                className="bg-green-500 text-white p-3 mt-5 rounded-md"
+                type="submit"
+              >
+                Add
+              </button>{" "}
+              {/* Button to submit new event */}
+            </div>
           </form>
         </DialogContent>
       </Dialog>
