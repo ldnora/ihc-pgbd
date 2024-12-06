@@ -32,3 +32,6 @@ Criação do modelo relacional, definição dos requisitos, inicio da criação 
 - [ ] Criar usuários para o sgbd de dar permissões a eles para realizar certas consultas, triggers, etc
 - [ ] 
 
+![alt text](image.png)
+
+![alt text](image-1.png)
