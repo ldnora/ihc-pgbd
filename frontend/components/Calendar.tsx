@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   formatDate,
   DateSelectArg,
@@ -17,28 +17,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Description } from "@radix-ui/react-dialog";
 
 const Calendar: React.FC = () => {
   const [currentEvents, setCurrentEvents] = useState<EventApi[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [isNewEventDialogOpen, setIsNewEventDialogOpen] = useState<boolean>(false);
+  const [isEventInfoDialogOpen, setIsEventInfoDialogOpen] = useState<boolean>(false);
   const [newEventTitle, setNewEventTitle] = useState<string>("");
   const [newEventDescription, setNewDescription] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<DateSelectArg | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<EventApi | null>(null);
-  const eventInfoDialogRef = useRef<HTMLDialogElement | null>(null);
-  const eventDialogRef = useRef<HTMLDialogElement | null>(null);
-
-
-  useEffect(() => {
-    // Load events from local storage when the component mounts
-    if (typeof window !== "undefined") {
-      const savedEvents = localStorage.getItem("events");
-      if (savedEvents) {
-        setCurrentEvents(JSON.parse(savedEvents));
-      }
-    }
-  }, []);
 
   useEffect(() => {
     // Save events to local storage whenever they change
@@ -49,48 +36,14 @@ const Calendar: React.FC = () => {
 
   const handleDateClick = (selected: DateSelectArg) => {
     setSelectedDate(selected);
-    setIsDialogOpen(true);
-  };
-
-  const handleDeleteEvent = (event: EventApi) => {
-    if (window.confirm("Are you sure you want to delete this event?")) {
-      event.remove(); // Remove o evento do FullCalendar.
-      eventInfoDialogRef.current.close(); // Fecha o diálogo de informações.
-    }
-  };
-  
-
-  const handleEditEvent = (event: React.SetStateAction<EventApi | null>) => {
-    // Preenche os inputs do formulário com os valores do evento selecionado.
-    setNewEventTitle(event.title);
-    setNewDescription(event.extendedProps.description || "");
-    setSelectedEvent(event); // Mantém o evento atual para salvar alterações.
-    
-    // Fecha o diálogo de informações e abre o diálogo de cadastro.
-    eventInfoDialogRef.current.close();
-    eventDialogRef.current.showModal(); // Reutiliza o diálogo de cadastro.
-  };
-  
-  const handleSaveEditedEvent = () => {
-    if (selectedEvent) {
-      selectedEvent.setProp("title", newEventTitle);
-      selectedEvent.setExtendedProp("description", newEventDescription);
-      eventDialogRef.current.close(); // Fecha o diálogo de cadastro.
-    }
-  };
-  
-
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false);
-    setNewEventTitle("");
-    setNewDescription("");
+    setIsNewEventDialogOpen(true);
   };
 
   const handleAddEvent = (e: React.FormEvent) => {
     e.preventDefault();
     if (newEventTitle && selectedDate) {
-      const calendarApi = selectedDate.view.calendar; // Get the calendar API instance.
-      calendarApi.unselect(); // Unselect the date range.
+      const calendarApi = selectedDate.view.calendar;
+      calendarApi.unselect();
 
       const newEvent = {
         id: `${selectedDate.start.toISOString()}-${newEventTitle}`,
@@ -102,7 +55,32 @@ const Calendar: React.FC = () => {
       };
 
       calendarApi.addEvent(newEvent);
-      handleCloseDialog();
+      setIsNewEventDialogOpen(false);
+      setNewEventTitle("");
+      setNewDescription("");
+    }
+  };
+
+  const handleEditEvent = (event: EventApi) => {
+    setNewEventTitle(event.title);
+    setNewDescription(event.extendedProps.description || "");
+    setSelectedEvent(event);
+    setIsEventInfoDialogOpen(false);
+    setIsNewEventDialogOpen(true);
+  };
+
+  const handleSaveEditedEvent = () => {
+    if (selectedEvent) {
+      selectedEvent.setProp("title", newEventTitle);
+      selectedEvent.setExtendedProp("description", newEventDescription);
+      setIsNewEventDialogOpen(false);
+    }
+  };
+
+  const handleDeleteEvent = (event: EventApi) => {
+    if (window.confirm("Are you sure you want to delete this event?")) {
+      event.remove();
+      setIsEventInfoDialogOpen(false);
     }
   };
 
@@ -133,8 +111,7 @@ const Calendar: React.FC = () => {
                       year: "numeric",
                       month: "short",
                       day: "numeric",
-                    })}{" "}
-                    {/* Format event start date */}
+                    })}
                   </label>
                 </li>
               ))}
@@ -144,45 +121,47 @@ const Calendar: React.FC = () => {
         <div className="w-9/12 mt-8">
           <FullCalendar
             height={"85vh"}
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]} // Initialize calendar with required plugins.
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             headerToolbar={{
               left: "prev,next today",
               center: "title",
               right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
-            }} // Set header toolbar options.
-            initialView="dayGridMonth" // Initial view mode of the calendar.
-            editable={true} // Allow events to be edited.
-            selectable={true} // Allow dates to be selectable.
-            selectMirror={true} // Mirror selections visually.
-            dayMaxEvents={true} // Limit the number of events displayed per day.
-            select={handleDateClick} // Handle date selection to create new events.
+            }}
+            initialView="dayGridMonth"
+            editable={true}
+            selectable={true}
+            selectMirror={true}
+            dayMaxEvents={true}
+            select={handleDateClick}
             eventClick={(info) => {
               setSelectedEvent(info.event);
-              eventInfoDialogRef.current.showModal();
-            }} // Handle clicking on events (e.g., to delete them).
-            eventsSet={(events) => setCurrentEvents(events)} // Update state with current events whenever they change.
+              setIsEventInfoDialogOpen(true);
+            }}
+            eventsSet={(events) => setCurrentEvents(events)}
             initialEvents={
               typeof window !== "undefined"
                 ? JSON.parse(localStorage.getItem("events") || "[]")
                 : []
-            } // Initial events loaded from local storage.
+            }
           />
         </div>
       </div>
 
-      {/* Dialog for adding new events */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      {/* Dialog for adding or editing events */}
+      <Dialog open={isNewEventDialogOpen} onOpenChange={setIsNewEventDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Event Details</DialogTitle>
+            <DialogTitle>
+              {selectedEvent ? "Edit Event Details" : "Add New Event Details"}
+            </DialogTitle>
           </DialogHeader>
-          <form className="space-x-5 mb-4" onSubmit={handleAddEvent}>
+          <form onSubmit={selectedEvent ? handleSaveEditedEvent : handleAddEvent}>
             <div className="flex flex-col gap-3">
               <input
                 type="text"
                 placeholder="Event Title"
                 value={newEventTitle}
-                onChange={(e) => setNewEventTitle(e.target.value)} // Update new event title as the user types.
+                onChange={(e) => setNewEventTitle(e.target.value)}
                 required
                 className="border border-gray-200 p-3 rounded-md text-lg"
               />
@@ -197,60 +176,52 @@ const Calendar: React.FC = () => {
                 className="bg-green-500 text-white p-3 mt-5 rounded-md"
                 type="submit"
               >
-                Add
-              </button>{" "}
-              {/* Button to submit new event */}
+                {selectedEvent ? "Save Changes" : "Add Event"}
+              </button>
             </div>
           </form>
         </DialogContent>
       </Dialog>
 
-      <dialog ref={eventInfoDialogRef} className="rounded-md bg-white p-5 shadow-lg">
-        {selectedEvent && (
-          <div>
-            <h2 className="text-xl font-bold mb-3">{selectedEvent.title}</h2>
-            <p className="text-gray-700 mb-3">
-              {selectedEvent.extendedProps.description || "No description available."}
-            </p>
-            <p className="text-sm text-gray-500">
-              Start: {selectedEvent.start.toLocaleString()}
-            </p>
-            {selectedEvent.end && (
-              <p className="text-sm text-gray-500">
-                End: {selectedEvent.end.toLocaleString()}
+      {/* Dialog for event info */}
+      <Dialog open={isEventInfoDialogOpen} onOpenChange={setIsEventInfoDialogOpen}>
+        <DialogContent>
+          {selectedEvent && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{selectedEvent.title}</DialogTitle>
+              </DialogHeader>
+              <p className="text-gray-700 mb-3">
+                {selectedEvent.extendedProps.description || "No description available."}
               </p>
-            )}
-
-            {/* Botões */}
-            <div className="flex justify-between mt-4">
-              <button
-                onClick={() => handleEditEvent(selectedEvent)} // Função de edição
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDeleteEvent(selectedEvent)} // Função de exclusão
-                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-              >
-                Delete
-              </button>
-            </div>
-
-            {/* Botão para fechar */}
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={() => eventInfoDialogRef.current.close()} // Fecha o diálogo
-                className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-md"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        )}
-      </dialog>
+              <p className="text-sm text-gray-500">
+                Start: {selectedEvent.start.toLocaleString()}
+              </p>
+              {selectedEvent.end && (
+                <p className="text-sm text-gray-500">
+                  End: {selectedEvent.end.toLocaleString()}
+                </p>
+              )}
+              <div className="flex justify-between mt-4">
+                <button
+                  onClick={() => handleEditEvent(selectedEvent)}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDeleteEvent(selectedEvent)}
+                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
-export default Calendar; // Export the Calendar component for use in other parts of the application.
+export default Calendar;
