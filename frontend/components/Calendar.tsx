@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 const Calendar: React.FC = () => {
   const [currentEvents, setCurrentEvents] = useState<EventApi[]>([]);
@@ -84,6 +85,14 @@ const Calendar: React.FC = () => {
     }
   };
 
+  const closeAllDialogs = () => {
+    setIsNewEventDialogOpen(false);
+    setIsEventInfoDialogOpen(false);
+    setNewEventTitle("");
+    setNewDescription("");
+    setSelectedEvent(null);
+  };
+
   return (
     <div>
       <div className="flex w-full px-10 justify-start items-start gap-8">
@@ -148,7 +157,13 @@ const Calendar: React.FC = () => {
       </div>
 
       {/* Dialog for adding or editing events */}
-      <Dialog open={isNewEventDialogOpen} onOpenChange={setIsNewEventDialogOpen}>
+      <Dialog 
+        open={isNewEventDialogOpen} 
+        onOpenChange={(open) => {
+          if (!open) closeAllDialogs(); // close the dialogs if you click on the 'x'
+        }}
+        modal
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
