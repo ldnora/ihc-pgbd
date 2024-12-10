@@ -47,21 +47,6 @@ const Calendar: React.FC = () => {
     };
     fetchEvents();
   }, []);
-
-  const getWeekRange = (date: Date) => {
-    const startOfWeek = new Date(date);
-    const endOfWeek = new Date(date);
-  
-    // Ajustar para o início e fim da semana (domingo a sábado)
-    startOfWeek.setDate(date.getDate() - date.getDay());
-    endOfWeek.setDate(date.getDate() + (6 - date.getDay()));
-  
-    // Formatar para o formato de consulta do banco, por exemplo, 'YYYY-MM-DD'
-    const start = startOfWeek.toISOString().split("T")[0];
-    const end = endOfWeek.toISOString().split("T")[0];
-  
-    return { start, end };
-  };
   
   const handleDateClick = (selected: DateSelectArg) => {
     setSelectedDate(selected);
@@ -119,7 +104,7 @@ const Calendar: React.FC = () => {
           updatedEvent.description
         );
   
-        // Atualiza o evento no estado local
+        // Atualiza o evento no estado local (navegador)
         setCurrentEvents((prev) =>
           prev.map((event) =>
             event.id === updatedEvent.id ? { ...event, ...updatedEvent } : event
@@ -138,7 +123,7 @@ const Calendar: React.FC = () => {
       try {  
         await eventoService.deletarEvento(event.id);
   
-        // Atualiza a lista local removendo o evento excluído
+        // remove o evento excluído
         setCurrentEvents((prev) =>
           prev.filter((currentEvent) => currentEvent.id !== event.id)
         );
@@ -155,7 +140,6 @@ const Calendar: React.FC = () => {
   const handleEventDrop = async (info: EventDropArg) => {
     const { event } = info;
   
-    // Obtenha as informações do evento
     const updatedEvent = {
       id: event.id, 
       start: event.start?.toISOString(), 
