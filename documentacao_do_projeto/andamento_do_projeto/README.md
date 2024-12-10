@@ -28,9 +28,8 @@ Criação do modelo relacional, definição dos requisitos, inicio da criação 
 ## Semana 7 (01/12 a 07/12)
 
 ### A fazer
-- [ ] Criar o frontend
-- [ ] Criar usuários para o sgbd de dar permissões a eles para realizar certas consultas, triggers, etc
-- [ ] 
+- [x] Criar o frontend
+- [ ] Integrar o backend com o frontend 
 
 Desenvolvimento do frontend:
 
@@ -69,4 +68,26 @@ Desenvolvimento do frontend:
 ![alt text](image-16.png)
 
 ![alt text](image-17.png)
+
+![alt text](image-18.png)
+
+![alt text](image-20.png)
+
+![alt text](image-19.png)
+
+![alt text](image-21.png)
+
+![alt text](image-22.png)
+
+![alt text](image-23.png)
+
+![alt text](image-24.png)
+
+![alt text](image-25.png)
+
+![alt text](image-26.png)
+
+![alt text](image-27.png)
+
+![alt text](image-28.png)
 
