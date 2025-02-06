@@ -6,6 +6,7 @@ import {
   DateSelectArg,
   EventClickArg,
   EventApi,
+  EventDropArg,
 } from "@fullcalendar/core";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -21,14 +22,14 @@ import {
 import eventoService from '../services/eventoService';
 
 const Calendar: React.FC = () => {
-  const [currentEvents, setCurrentEvents] = useState<EventApi[]>([]);
+  const [currentEvents, setCurrentEvents] = useState<any[]>([]);
   const [isNewEventDialogOpen, setIsNewEventDialogOpen] = useState<boolean>(false);
   const [isEventInfoDialogOpen, setIsEventInfoDialogOpen] = useState<boolean>(false);
   const [newEventTitle, setNewEventTitle] = useState<string>("");
   const [newEventDescription, setNewDescription] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<DateSelectArg | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<EventApi | null>(null);
-  
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -37,7 +38,7 @@ const Calendar: React.FC = () => {
           id: event.evento_id,
           title: event.nome,
           description: event.descricao,
-          start: event.data_inicio, 
+          start: event.data_inicio,
           end: event.data_fim
         }));
         setCurrentEvents(formattedEvents);
@@ -47,7 +48,7 @@ const Calendar: React.FC = () => {
     };
     fetchEvents();
   }, []);
-  
+
   const handleDateClick = (selected: DateSelectArg) => {
     setSelectedDate(selected);
     setIsNewEventDialogOpen(true);
@@ -60,16 +61,22 @@ const Calendar: React.FC = () => {
       calendarApi.unselect();
   
       const newEvent = {
-        categoria_id: null, 
-        nome: newEventTitle, 
-        descricao: newEventDescription || "", 
+        categoria_id: null,
+        nome: newEventTitle,
+        descricao: newEventDescription || "",
         data_inicio: selectedDate.start.toISOString(),
         data_fim: selectedDate.end?.toISOString() || selectedDate.start.toISOString(),
       };
   
       try {
         const createdEvent = await eventoService.criarEvento(newEvent);
-        setCurrentEvents((prev) => [...prev, createdEvent.data]); // Atualiza o estado local com o retorno do backend
+        setCurrentEvents((prev) => [...prev, {
+          id: createdEvent.data.evento_id,
+          title: createdEvent.data.nome,
+          description: createdEvent.data.descricao,
+          start: createdEvent.data.data_inicio,
+          end: createdEvent.data.data_fim
+        }]);
         setIsNewEventDialogOpen(false);
         setNewEventTitle("");
         setNewDescription("");
@@ -78,7 +85,7 @@ const Calendar: React.FC = () => {
       }
     }
   };
-  
+
   const handleEditEvent = (event: EventApi) => {
     setNewEventTitle(event.title);
     setNewDescription(event.extendedProps.description || "");
@@ -89,12 +96,12 @@ const Calendar: React.FC = () => {
 
   const handleSaveEditedEvent = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (selectedEvent) {
       const updatedEvent = {
         id: selectedEvent.id,
         title: newEventTitle || selectedEvent.title,
-        description: newEventDescription || null
+        description: newEventDescription || null,
       };
 
       try {
@@ -103,14 +110,18 @@ const Calendar: React.FC = () => {
           updatedEvent.title,
           updatedEvent.description
         );
-  
-        // Atualiza o evento no estado local (navegador)
-        setCurrentEvents((prev) =>
-          prev.map((event) =>
-            event.id === updatedEvent.id ? { ...event, ...updatedEvent } : event
-          )
-        );
-        // console.log(updatedEvent);
+
+        // Recarrega os eventos do backend para garantir que o estado esteja atualizado
+        const events = await eventoService.getAllEventos();
+        const formattedEvents = events.map((event: any) => ({
+          id: event.evento_id,
+          title: event.nome,
+          description: event.descricao,
+          start: event.data_inicio,
+          end: event.data_fim
+        }));
+        setCurrentEvents(formattedEvents);
+
         closeAllDialogs();
       } catch (error) {
         console.error(error);
@@ -120,14 +131,20 @@ const Calendar: React.FC = () => {
 
   const handleDeleteEvent = async (event: EventApi) => {
     if (window.confirm("Tem certeza de que deseja excluir este evento?")) {
-      try {  
+      try {
         await eventoService.deletarEvento(event.id);
-  
-        // remove o evento excluído
-        setCurrentEvents((prev) =>
-          prev.filter((currentEvent) => currentEvent.id !== event.id)
-        );
-  
+
+        // Recarrega os eventos do backend para garantir que o estado esteja atualizado
+        const events = await eventoService.getAllEventos();
+        const formattedEvents = events.map((event: any) => ({
+          id: event.evento_id,
+          title: event.nome,
+          description: event.descricao,
+          start: event.data_inicio,
+          end: event.data_fim
+        }));
+        setCurrentEvents(formattedEvents);
+        
         setIsEventInfoDialogOpen(false);
         alert("Evento excluído com sucesso!");
       } catch (error) {
@@ -136,29 +153,35 @@ const Calendar: React.FC = () => {
       }
     }
   };
-  
+
   const handleEventDrop = async (info: EventDropArg) => {
     const { event } = info;
-  
+
     const updatedEvent = {
-      id: event.id, 
-      start: event.start?.toISOString(), 
+      id: event.id,
+      start: event.start?.toISOString(),
       end: event.end?.toISOString(),
     };
 
-    // console.log(updatedEvent);
-  
     try {
       await eventoService.atualizarHorarioEvento(
         updatedEvent.id,
         updatedEvent.start,
         updatedEvent.end
       );
-  
+
+      // Atualiza o estado local para refletir a mudança
+      setCurrentEvents((prev) =>
+        prev.map((currentEvent) =>
+          currentEvent.id === updatedEvent.id
+            ? { ...currentEvent, start: updatedEvent.start, end: updatedEvent.end }
+            : currentEvent
+        )
+      );
     } catch (error) {
       console.error("Erro ao atualizar evento:", error);
       alert("Erro ao atualizar evento. Tente novamente.");
-  
+
       info.revert();
     }
   };
@@ -186,7 +209,7 @@ const Calendar: React.FC = () => {
             )}
 
             {currentEvents.length > 0 &&
-              currentEvents.map((event: EventApi) => (
+              currentEvents.map((event: any) => (
                 <li
                   className="border border-gray-200 shadow px-4 py-2 rounded-md text-blue-800"
                   key={event.id}
@@ -194,7 +217,7 @@ const Calendar: React.FC = () => {
                   {event.title}
                   <br />
                   <label className="text-slate-950">
-                    {formatDate(event.start!, {
+                    {formatDate(event.start, {
                       year: "numeric",
                       month: "short",
                       day: "numeric",
@@ -215,7 +238,7 @@ const Calendar: React.FC = () => {
               right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
             }}
             locale={'pt-br'}
-            timeZone={'Ameria/Sao_Paulo'} 
+            timeZone={'America/Sao_Paulo'}
             initialView="timeGridWeek"
             editable={true}
             selectable={true}
@@ -228,12 +251,7 @@ const Calendar: React.FC = () => {
             }}
             events={currentEvents}
             eventDrop={handleEventDrop}
-            eventResize={handleEventDrop} 
-            initialEvents={
-              typeof window !== "undefined"
-                ? JSON.parse(localStorage.getItem("events") || "[]")
-                : []
-            }
+            eventResize={handleEventDrop}
           />
         </div>
       </div>
