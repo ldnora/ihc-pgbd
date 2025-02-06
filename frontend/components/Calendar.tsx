@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import {
   formatDate,
   DateSelectArg,
-  EventClickArg,
   EventApi,
   EventDropArg,
 } from "@fullcalendar/core";
@@ -21,8 +20,19 @@ import {
 
 import eventoService from '../services/eventoService';
 
+interface CalendarEvent {
+  id: string | number;
+  title: string;
+  description?: string;
+  start: string;
+  end: string;
+  extendedProps?: {
+    description?: string;
+  };
+}
+
 const Calendar: React.FC = () => {
-  const [currentEvents, setCurrentEvents] = useState<any[]>([]);
+  const [currentEvents, setCurrentEvents] = useState<CalendarEvent[]>([]);
   const [isNewEventDialogOpen, setIsNewEventDialogOpen] = useState<boolean>(false);
   const [isEventInfoDialogOpen, setIsEventInfoDialogOpen] = useState<boolean>(false);
   const [newEventTitle, setNewEventTitle] = useState<string>("");
@@ -39,7 +49,10 @@ const Calendar: React.FC = () => {
           title: event.nome,
           description: event.descricao,
           start: event.data_inicio,
-          end: event.data_fim
+          end: event.data_fim,
+          extendedProps: {
+            description: event.descricao
+          }
         }));
         setCurrentEvents(formattedEvents);
       } catch (error) {
@@ -47,7 +60,7 @@ const Calendar: React.FC = () => {
       }
     };
     fetchEvents();
-  }, []);
+  }, []); // Dependência vazia para executar apenas na montagem
 
   const handleDateClick = (selected: DateSelectArg) => {
     setSelectedDate(selected);
@@ -59,7 +72,7 @@ const Calendar: React.FC = () => {
     if (newEventTitle && selectedDate) {
       const calendarApi = selectedDate.view.calendar;
       calendarApi.unselect();
-  
+
       const newEvent = {
         categoria_id: null,
         nome: newEventTitle,
@@ -67,7 +80,7 @@ const Calendar: React.FC = () => {
         data_inicio: selectedDate.start.toISOString(),
         data_fim: selectedDate.end?.toISOString() || selectedDate.start.toISOString(),
       };
-  
+
       try {
         const createdEvent = await eventoService.criarEvento(newEvent);
         setCurrentEvents((prev) => [...prev, {
@@ -111,16 +124,13 @@ const Calendar: React.FC = () => {
           updatedEvent.description
         );
 
-        // Recarrega os eventos do backend para garantir que o estado esteja atualizado
-        const events = await eventoService.getAllEventos();
-        const formattedEvents = events.map((event: any) => ({
-          id: event.evento_id,
-          title: event.nome,
-          description: event.descricao,
-          start: event.data_inicio,
-          end: event.data_fim
-        }));
-        setCurrentEvents(formattedEvents);
+        setCurrentEvents((prevEvents) => {
+          // Criamos um novo array sem o evento deletado
+          const updatedEvents = prevEvents.filter(
+            (currentEvent) => String(currentEvent.id) !== String(updatedEvent.id)
+          );
+          return updatedEvents;
+        });
 
         closeAllDialogs();
       } catch (error) {
@@ -132,20 +142,21 @@ const Calendar: React.FC = () => {
   const handleDeleteEvent = async (event: EventApi) => {
     if (window.confirm("Tem certeza de que deseja excluir este evento?")) {
       try {
+        // Primeiro, vamos deletar do backend
         await eventoService.deletarEvento(event.id);
 
-        // Recarrega os eventos do backend para garantir que o estado esteja atualizado
-        const events = await eventoService.getAllEventos();
-        const formattedEvents = events.map((event: any) => ({
-          id: event.evento_id,
-          title: event.nome,
-          description: event.descricao,
-          start: event.data_inicio,
-          end: event.data_fim
-        }));
-        setCurrentEvents(formattedEvents);
-        
+        // Depois, atualizamos o estado local usando o setCurrentEvents
+        setCurrentEvents((prevEvents) => {
+          // Criamos um novo array sem o evento deletado
+          const updatedEvents = prevEvents.filter(
+            (currentEvent) => String(currentEvent.id) !== String(event.id)
+          );
+          return updatedEvents;
+        });
+
+        // Fechamos o modal
         setIsEventInfoDialogOpen(false);
+
         alert("Evento excluído com sucesso!");
       } catch (error) {
         console.error("Erro ao excluir evento:", error);
@@ -170,14 +181,13 @@ const Calendar: React.FC = () => {
         updatedEvent.end
       );
 
-      // Atualiza o estado local para refletir a mudança
-      setCurrentEvents((prev) =>
-        prev.map((currentEvent) =>
-          currentEvent.id === updatedEvent.id
-            ? { ...currentEvent, start: updatedEvent.start, end: updatedEvent.end }
-            : currentEvent
-        )
-      );
+      setCurrentEvents((prevEvents) => {
+        // Criamos um novo array sem o evento deletado
+        const updatedEvents = prevEvents.filter(
+          (currentEvent) => String(currentEvent.id) !== String(event.id)
+        );
+        return updatedEvents;
+      });
     } catch (error) {
       console.error("Erro ao atualizar evento:", error);
       alert("Erro ao atualizar evento. Tente novamente.");
@@ -252,6 +262,18 @@ const Calendar: React.FC = () => {
             events={currentEvents}
             eventDrop={handleEventDrop}
             eventResize={handleEventDrop}
+            key={currentEvents.length} // Força re-renderização quando eventos mudam
+            forceEventDuration={true}
+            eventContent={(eventInfo) => {
+              return (
+                <div>
+                  <p>{eventInfo.event.title}</p>
+                  {eventInfo.event.extendedProps.description && (
+                    <small>{eventInfo.event.extendedProps.description}</small>
+                  )}
+                </div>
+              );
+            }}
           />
         </div>
       </div>
@@ -325,7 +347,7 @@ const Calendar: React.FC = () => {
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDeleteEvent(selectedEvent!)}
+                  onClick={() => handleDeleteEvent(selectedEvent)}
                   className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
                 >
                   Delete
